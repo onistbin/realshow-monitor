@@ -129,9 +129,11 @@ class Monitor extends Component {
      * 发送log，一次最多发10条
      */
     timingTrans () {
-        const logArr = this.keyList.splice(0, 10);
-        if (logArr.length) {
-            console.log(`本次发送日志为: ${JSON.stringify(logArr)}`);
+        const keyList = this.keyList.splice(0, 10);
+        if (keyList.length) {
+            keyList.forEach(key => {
+                console.log(`本次发送日志为: ${this.monitorStore[key].log}`);
+            });
         }
     }
 
