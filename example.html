@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>信息流真实展现打点统计</title>
+  <style>
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+	}
+    .infoflow-item {
+      list-style: none;
+      height: 100px;
+      border: 1px solid #ccc;
+      width: 660px;
+	  text-align: center;
+	  line-height: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div id="list">
+  </div>
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+  <script src="monitor.js"></script>
+  <script>
+	(function () {
+		/**
+		 * 存放所有log的容器
+		 * monitorStore = {
+		 * 		dataKey: {
+		 * 			log: xxx,
+		 * 			realtime: {
+		 * 				sTime: ,
+		 * 				eTime: 
+		 * 			}
+		 * 		}
+		 * }
+		 */
+		let monitorStore = {};
+
+		/**
+		 * 模拟渲染信息流，添加data-key，并将所有的log收集起来
+		 * 真实使用场景中，key可能是数据当中的某一个唯一标识
+		 */
+		const render = function () {
+			let key = '';
+			let html = '';
+			for (let i = 0; i < 10; i++) {
+				key = '' + (+new Date()) + Math.random();
+				html += `<div class="infoflow-item" data-key="${key}">content-${i}</div>`;
+
+				/**
+				 * 保存打点log，log点击的时候可能也要用
+				 * realtime = realtime.eTime - realtime.sTime
+				 * isSendout  标记是否已经发送了log
+				 */
+				monitorStore[key] = {
+					log: `dom${i} log`,
+					realtime: {
+						sTime: 0,
+						eTime: 0
+					},
+					isSendout: 0
+				};
+			}
+			$('#list').html(html);
+		};
+		render();
+
+		/**
+		 * 初始化 monitor
+		 */
+		const monitor = new Monitor({
+			wrap: '#list',
+			selector: '.infoflow-item',
+			min: 50,
+			realshowTime: 3000,
+			monitorStore: monitorStore
+		});
+
+		monitor.run();
+
+		// 如果数据动态更新，可通过 updateMonitorStore 来更新 monitorStore
+		// monitor.updateMonitorStore(obj)
+	})();
+  </script>
+</body>
+</html>
